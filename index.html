@@ -1,58 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sumit | Portfolio</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Sumit</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- Loader -->
-    <div class="loader">
+    <!-- LOADER -->
+    <div class="loading">
         <div class="circle"></div>
-        <h2>Welcome to Sumit's Portfolio</h2>
+        <h2>LOADING…</h2>
     </div>
 
-    <!-- Main Content -->
-    <div class="container hidden">
-
+    <!-- MAIN CONTENT -->
+    <div class="main hidden">
         <header>
             <h1>Sumit</h1>
-            <p>Web Developer • Creator • Designer</p>
+            <p>Web Developer • Creator</p>
         </header>
 
-        <section class="about">
+        <section>
             <h2>About Me</h2>
             <p>
-                Hi! I'm Sumit — a self-taught developer who enjoys building clean, fast,
-                and modern websites. I love coding, creating designs, and learning new tech.
+                Hi, I'm Sumit — a developer who loves building clean websites.
             </p>
         </section>
 
-        <section class="skills">
+        <section>
             <h2>Skills</h2>
             <ul>
                 <li>HTML / CSS / JS</li>
-                <li>UI Designing</li>
-                <li>Basic Python</li>
-                <li>Content Creation</li>
+                <li>Editing</li>
+                <li>UI Design</li>
             </ul>
         </section>
 
-        <section class="contact">
+        <section>
             <h2>Contact</h2>
-            <a class="btn" href="https://t.me/+D8We1:TelegramChannelLink" target="_blank">Join My Telegram</a>
+            <a href="https://t.me/ItzCreator" class="btn" target="_blank">Telegram</a>
         </section>
-
     </div>
 
     <script>
-        // Loader hide after 2 seconds
         setTimeout(() => {
-            document.querySelector(".loader").style.display = "none";
-            document.querySelector(".container").classList.remove("hidden");
+            document.querySelector(".loading").style.display = "none";
+            document.querySelector(".main").classList.remove("hidden");
         }, 2000);
     </script>
 

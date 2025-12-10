@@ -1,45 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>About Sumit</title>
-<link rel="stylesheet" href="style.css">
-</head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sumit — @ItzCreator</title>
 
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
 <body>
 
-<!-- LOADING SCREEN -->
-<div class="loading">
+  <!-- LOADER -->
+  <div class="loading" aria-hidden="true">
     <div class="loader-circle"></div>
-    <p class="loading-text">LOADING...</p>
-</div>
+    <div class="loader-bar"><div class="progress"></div></div>
+    <p class="loading-text">LOADING…</p>
+  </div>
 
-<!-- MAIN CONTENT -->
-<div class="main" style="display:none;">
-    
-    <h1>Sumit</h1>
-    <p class="sub">Web Developer / Creator</p>
+  <!-- MAIN CONTENT -->
+  <main class="main" style="display:none;">
+    <section class="card">
+      <div class="avatar-wrap">
+        <div class="avatar-border">
+          <!-- Try local image first, fall back to hosted if missing -->
+          <img id="profileImg" src="./IMG_20251210_205101_941.jpg"
+               alt="Sumit" onerror="this.onerror=null;this.src='https://files.catbox.moe/8vn4sn.jpg'">
+        </div>
+      </div>
 
-    <div class="profile">
-        <img src="./sumit.jpg" alt="Sumit">
-    </div>
+      <h1 class="name">Sumit <span class="age">· 20</span></h1>
+      <p class="handle">@ItzCreator</p>
 
-    <h2>About Me</h2>
-    <p class="para">I am Sumit — a passionate web developer, video editor & digital creator.</p>
+      <div class="btn-row">
+        <a class="vikky-btn" href="https://t.me/+CpfvklAFQLgwYTY1" target="_blank" rel="noopener noreferrer">
+          JOIN MY CHANNEL
+        </a>
+        <a class="ghost-btn" href="https://t.me/creator154" target="_blank" rel="noopener noreferrer">
+          DM Me
+        </a>
+      </div>
 
-    <h2>Skills</h2>
-    <ul class="skills">
-        <li>HTML / CSS / JS</li>
-        <li>Editing</li>
-        <li>UI Design</li>
-    </ul>
+      <div class="section about">
+        <h2>About Me</h2>
+        <p>I am Sumit — a passionate web developer, video editor & digital creator. I build small websites and share content on my Telegram channel.</p>
+      </div>
 
-    <h2>Contact</h2>
-    <a class="btn" href="https://t.me/+CpfvklAFQLgwYTY1">Telegram</a>
+      <div class="section skills">
+        <h2>Skills</h2>
+        <div class="chips">
+          <span class="chip">HTML</span>
+          <span class="chip">CSS</span>
+          <span class="chip">JavaScript</span>
+          <span class="chip">Editing</span>
+          <span class="chip">UI Design</span>
+        </div>
+      </div>
 
-</div>
+      <footer class="footer">
+        © <span id="year"></span> Sumit — Made with ♥
+      </footer>
+    </section>
+  </main>
 
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
-</html>
+    </html>

@@ -1,10 +1,84 @@
-<div class="loading">
-    <div class="loader-circle"></div>
-    <div class="loader-bar">
-        <div class="progress"></div>
-    </div>
-    <p class="loading-text">LOADING…</p>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Website</title>
 
-<div class="main" style="display:none;">
-    <!-- YOUR PAGE CONTENT HERE -->
+    <style>
+        /* LOADING SCREEN CSS */
+        body { margin: 0; padding: 0; }
+
+        .loading {
+            text-align: center;
+            padding-top: 70px;
+            font-family: sans-serif;
+        }
+
+        .loader-circle {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #ddd;
+            border-top-color: #3498db;
+            border-radius: 50%;
+            margin: 0 auto;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-bar {
+            width: 200px;
+            height: 6px;
+            background: #ddd;
+            margin: 20px auto;
+            overflow: hidden;
+            border-radius: 5px;
+        }
+
+        .loader-bar .progress {
+            width: 0%;
+            height: 100%;
+            background: #3498db;
+            animation: loadBar 2s forwards;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes loadBar {
+            to { width: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 🔵 LOADER START -->
+    <div class="loading">
+        <div class="loader-circle"></div>
+        <div class="loader-bar">
+            <div class="progress"></div>
+        </div>
+        <p class="loading-text">LOADING…</p>
+    </div>
+    <!-- 🔵 LOADER END -->
+
+    <!-- 🔴 MAIN CONTENT HIDE BY DEFAULT -->
+    <div class="main" style="display:none;">
+
+        <!-- ⭐ APNA PURA WEBSITE CONTENT YAHAN RAKHNA ⭐ -->
+        <h1>Hello, Website Loaded!</h1>
+        <p>Ab tumhara actual content yahan ayega.</p>
+
+    </div>
+
+    <!-- LOADER HIDE SCRIPT -->
+    <script>
+        window.addEventListener("load", function() {
+            document.querySelector(".loading").style.display = "none";
+            document.querySelector(".main").style.display = "block";
+        });
+    </script>
+
+</body>
+</html>

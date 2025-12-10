@@ -1,82 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Sumit</title>
-
-    <style>
-        body { margin: 0; padding: 0; font-family: sans-serif; }
-
-        /* LOADER */
-        .loading {
-            text-align: center;
-            padding-top: 80px;
-        }
-
-        .loader-circle {
-            width: 60px;
-            height: 60px;
-            border: 6px solid #ddd;
-            border-top-color: #3498db;
-            border-radius: 50%;
-            margin: 0 auto;
-            animation: spin 1s linear infinite;
-        }
-
-        .loader-bar {
-            width: 200px;
-            height: 6px;
-            background: #ddd;
-            margin: 20px auto;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .loader-bar .progress {
-            width: 0%;
-            height: 100%;
-            background: #3498db;
-            animation: loadBar 2s forwards;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes loadBar {
-            to { width: 100%; }
-        }
-
-        /* MAIN HIDDEN BY DEFAULT */
-        .main {
-            display: none;
-            padding: 20px;
-        }
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sumit | Portfolio</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
     <!-- Loader -->
-    <div class="loading">
-        <div class="loader-circle"></div>
-        <div class="loader-bar"><div class="progress"></div></div>
-        <p>LOADING…</p>
+    <div class="loader">
+        <div class="circle"></div>
+        <h2>Welcome to Sumit's Portfolio</h2>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="main">
-        <!-- Yahan apna pura website paste karo -->
-        <h1>Hello, Website Loaded!</h1>
-        <p>Ab tumhara actual content dikh raha hai.</p>
+    <!-- Main Content -->
+    <div class="container hidden">
+
+        <header>
+            <h1>Sumit</h1>
+            <p>Web Developer • Creator • Designer</p>
+        </header>
+
+        <section class="about">
+            <h2>About Me</h2>
+            <p>
+                Hi! I'm Sumit — a self-taught developer who enjoys building clean, fast,
+                and modern websites. I love coding, creating designs, and learning new tech.
+            </p>
+        </section>
+
+        <section class="skills">
+            <h2>Skills</h2>
+            <ul>
+                <li>HTML / CSS / JS</li>
+                <li>UI Designing</li>
+                <li>Basic Python</li>
+                <li>Content Creation</li>
+            </ul>
+        </section>
+
+        <section class="contact">
+            <h2>Contact</h2>
+            <a class="btn" href="https://t.me/+D8We1:TelegramChannelLink" target="_blank">Join My Telegram</a>
+        </section>
+
     </div>
 
     <script>
-        window.addEventListener("load", function() {
-            document.querySelector(".loading").style.display = "none";
-            document.querySelector(".main").style.display = "block";
-        });
+        // Loader hide after 2 seconds
+        setTimeout(() => {
+            document.querySelector(".loader").style.display = "none";
+            document.querySelector(".container").classList.remove("hidden");
+        }, 2000);
     </script>
 
 </body>

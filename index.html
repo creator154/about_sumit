@@ -1,78 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Sumit</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Sumit</title>
 
-    <link rel="stylesheet" href="style.css">
-
-    <style>
-        body { margin: 0; padding: 0; background: #000; color: white; font-family: sans-serif;}
-
-        /* LOADING SCREEN */
-        .loading {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            transition: 0.5s;
-        }
-
-        .loader-text {
-            font-size: 22px;
-            letter-spacing: 2px;
-        }
-
-        /* MAIN CONTENT HIDE */
-        .main { display: none; padding: 20px; }
-    </style>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- LOADING SCREEN -->
-    <div class="loading">
-        <p class="loader-text">LOADING...</p>
-    </div>
+<div class="loading">
+    <div class="loader-circle"></div>
+    <p>LOADING...</p>
+</div>
 
-    <!-- MAIN WEBSITE CONTENT -->
-    <div class="main">
+<div class="main" style="display:none;">
 
-        <h1>Sumit</h1>
-        <p>Web Developer • Creator</p>
+    <h1>Sumit</h1>
+    <p>Web Developer / Creator</p>
 
-        <h2>About Me</h2>
-        <p>
-            Hi, I’m Sumit — a developer who loves building clean websites.
-        </p>
+    <img src="sumit.jpg" alt="Sumit">
 
-        <h2>Skills</h2>
-        <ul>
-            <li>HTML / CSS / JS</li>
-            <li>Editing</li>
-            <li>UI Design</li>
-        </ul>
+    <h2>About Me</h2>
+    <p>Mera short intro yahaan…</p>
 
-        <h2>Contact</h2>
-        <a href="https://t.me/+CpfvklAFQLgwYTY1" style="color:#4dc3ff;">Telegram</a>
+    <h2>Skills</h2>
+    <ul>
+        <li>HTML / CSS / JS</li>
+        <li>Editing</li>
+        <li>UI Design</li>
+    </ul>
 
-    </div>
+    <h2>Contact</h2>
+    <a href="https://t.me/+CpfvklAFQLgwYTY1">Telegram</a>
 
-    <script>
-        window.addEventListener("load", () => {
-            setTimeout(() => {
-                document.querySelector(".loading").style.opacity = "0";
-                setTimeout(() => {
-                    document.querySelector(".loading").style.display = "none";
-                    document.querySelector(".main").style.display = "block";
-                }, 500);
-            }, 2500);
-        });
-    </script>
+</div>
+
+<script>
+window.addEventListener("load", () => {
+    setTimeout(() => {
+        document.querySelector(".loading").style.opacity = "0";
+
+        setTimeout(() => {
+            document.querySelector(".loading").style.display = "none";
+            document.querySelector(".main").style.display = "block";
+        }, 500);
+
+    }, 2000);
+});
+</script>
 
 </body>
 </html>

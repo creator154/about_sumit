@@ -1,9 +1,15 @@
-window.addEventListener("load", () => {
+window.onload = () => {
+    const loader = document.getElementById("loader");
+    const main = document.getElementById("main");
+
     setTimeout(() => {
-        document.getElementById("loader").style.opacity = "0";
+        loader.style.opacity = "0";
+        loader.style.transition = "0.5s";
+
         setTimeout(() => {
-            document.getElementById("loader").style.display = "none";
-            document.getElementById("main").style.display = "block";
-        }, 400);
-    }, 2000);
-});
+            loader.style.display = "none";
+            main.style.display = "block";
+        }, 500);
+
+    }, 1000);  // Loader 1 sec
+};

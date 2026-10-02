@@ -1,122 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creator Portfolio</title>
-
+    <title>Zx Site - Master Admin Panel</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: #0b0b0b;
-            font-family: Arial, sans-serif;
-            color: white;
-            text-align: center;
-        }
-
-        /* Loader Screen */
-        #loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            font-size: 22px;
-            z-index: 999;
-        }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 6px solid #333;
-            border-top: 6px solid #00d0ff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
-        }
-
-        @keyframes spin {
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Main Content */
-        #main {
-            display: none;
-            padding: 30px;
-        }
-
-        .profile-img {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            border: 3px solid #00d0ff;
-            object-fit: cover;
-            margin-top: 20px;
-        }
-
-        h1 {
-            margin-top: 15px;
-            font-size: 30px;
-        }
-
-        p {
-            opacity: 0.8;
-            font-size: 18px;
-        }
-
-        .btn {
-            display: block;
-            width: 80%;
-            max-width: 250px;
-            margin: 15px auto;
-            padding: 12px;
-            background: #00d0ff;
-            color: black;
-            border-radius: 10px;
-            text-decoration: none;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .btn:hover {
-            opacity: 0.8;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #f1f2f6; padding: 50px 20px; color: #2f3542; }
+        .dashboard-box { max-width: 450px; margin: auto; background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h2 { text-align: center; margin-bottom: 25px; color: #1e90ff; }
+        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #ced6e0; outline: none; font-size: 15px; }
+        button { background: #1e90ff; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #3742fa; }
+        #statusReport { text-align: center; font-weight: bold; margin-top: 15px; font-size: 14px; }
     </style>
-
-    <script>
-        // Loader hide after 2 seconds
-        window.onload = function() {
-            setTimeout(() => {
-                document.getElementById("loader").style.display = "none";
-                document.getElementById("main").style.display = "block";
-            }, 2000);
-        }
-    </script>
 </head>
-
 <body>
 
-    <!-- Loading Screen -->
-    <div id="loader">
-        <div class="spinner"></div>
-        Loading…
+    <div class="dashboard-box">
+        <h2>Zx Master Dashboard</h2>
+        
+        <!-- Secure Gate 1: Password Authenticator -->
+        <div id="authPanel">
+            <p style="font-size: 13px; color: gray; margin-bottom: 10px; text-align: center;">Enter system tokens to establish control link.</p>
+            <input type="text" id="adminUser" placeholder="Admin Username">
+            <input type="password" id="adminPass" placeholder="System Security Password">
+            <button onclick="authenticateAdmin()">Verify Identity (JWT)</button>
+        </div>
+
+        <!-- Secure Gate 2: Hidden Excel Upload Control -->
+        <div id="uploadPanel" style="display: none;">
+            <p style="color: #2ed573; font-weight: bold; text-align: center; margin-bottom: 15px;">✓ Secure Session Connected</p>
+            <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 5px;">Select Test Pattern Excel Sheet (.xlsx):</label>
+            <input type="file" id="bulkSheet" accept=".xlsx, .xls">
+            <button onclick="triggerAutoInject()" style="background: #2ed573;">Upload & Update Main Site</button>
+        </div>
+        
+        <div id="statusReport"></div>
     </div>
 
-    <!-- Main Portfolio -->
-    <div id="main">
-        <img src="https://files.catbox.moe/a89zz4.jpg" class="profile-img">
-        <h1>ItzCreator</h1>
-        <p>Welcome to my official page.</p>
+    <script>
+        let secureJWTToken = "";
+        const reportBox = document.getElementById('statusReport');
 
-        <a href="https://t.me/+CpfvklAFQLgwYTY1" class="btn">Join My Channel</a>
-        <a href="https://t.me/ItzCreator" class="btn">Message Me</a>
-    </div>
+        async function authenticateAdmin() {
+            const username = document.getElementById('adminUser').value;
+            const password = document.getElementById('adminPass').value;
+            
+            const res = await fetch('/api/zx-admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+            
+            if(data.success) {
+                secureJWTToken = data.token;
+                document.getElementById('authPanel').style.display = 'none';
+                document.getElementById('uploadPanel').style.display = 'block';
+                reportBox.innerText = "";
+            } else {
+                reportBox.style.color = "#ff4757";
+                reportBox.innerText = data.error;
+            }
+        }
 
+        async function triggerAutoInject() {
+            const fileChooser = document.getElementById('bulkSheet');
+            if(fileChooser.files.length === 0) return alert("Please choose an Excel doc matrix first!");
+
+            const formData = new FormData();
+            formData.append("excelDoc", fileChooser.files[0]);
+
+            reportBox.style.color = "#ffa500";
+            reportBox.innerText = "Processing rows and streaming payload to database...";
+
+            const res = await fetch('/api/zx-admin/auto-update-tests', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${secureJWTToken}` },
+                body: formData
+            });
+            const data = await res.json();
+
+            if(data.success) {
+                reportBox.style.color = "#2ed573";
+                reportBox.innerText = data.message;
+            } else {
+                reportBox.style.color = "#ff4757";
+                reportBox.innerText = data.error;
+            }
+        }
+    </script>
 </body>
 </html>

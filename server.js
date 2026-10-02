@@ -13,15 +13,13 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 6000;
-// Note: Isme aap apni wahi MongoDB Atlas live cloud connection string connect karenge
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/zx_master_db";
 const JWT_SECRET = process.env.JWT_SECRET || "ZX_SUPER_SECRET_KEY_PROD_2026";
 
 mongoose.connect(MONGO_URI)
-    .then(() => console.log("Admin Engine Connected to Master Database ✅"))
+    .then(() => console.log("Admin Token Engine Connected ✅"))
     .catch(err => console.error("Database Connection Error:", err));
 
-// Test Database Structure (Exact matching schema)
 const ZxTestSchema = new mongoose.Schema({
     targetBatch: String,
     testTitle: String,
@@ -32,53 +30,56 @@ const ZxTestSchema = new mongoose.Schema({
 });
 const ZxTest = mongoose.model('ZxTest', ZxTestSchema, 'zxtests');
 
-// Secure Admin JWT Verification Middleware
-const verifyAdminJWT = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) return res.status(401).json({ error: "Access Denied! Security Token Missing." });
+// 1. API: Token verify karte hi batch permissions auto-extract karne ka route
+app.post('/api/zx-admin/verify-token', (req, res) => {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ error: "Token string missing!" });
 
     jwt.verify(token, JWT_SECRET, (err, decoded) => {
-        if (err) return res.status(403).json({ error: "Session Expired! Please login again." });
-        req.admin = decoded;
-        next();
+        if (err) return res.status(403).json({ error: "Invalid or Expired Token Matrix!" });
+        
+        // Token se allowed batches ki array return karega (e.g. ['Yakeen NEET', 'Prayas JEE'])
+        res.json({ 
+            success: true, 
+            allowedBatches: decoded.allowedBatches || ['Yakeen NEET', 'Prayas JEE', 'Arjuna JEE', 'Lakshya NEET'] 
+        });
     });
-};
-
-// API: Admin Authentication Login
-app.post('/api/zx-admin/login', (req, res) => {
-    const { username, password } = req.body;
-    // Hardcoded credentials for super safety
-    if (username === 'zx_super_admin' && password === 'pw_portal_pass_2026') {
-        const token = jwt.sign({ role: 'super_admin' }, JWT_SECRET, { expiresIn: '48h' });
-        return res.json({ success: true, token });
-    }
-    res.status(401).json({ error: "Invalid Admin Credentials!" });
 });
 
-// API: MAIN BULK BATCH AUTO-UPDATE (Excel Parse Router)
-app.post('/api/zx-admin/auto-update-tests', verifyAdminJWT, upload.single('excelDoc'), async (req, res) => {
+// 2. API: Secure Bulk Upload Routing with Token Check
+app.post('/api/zx-admin/auto-update-tests', upload.single('excelDoc'), async (req, res) => {
     try {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+
+        if (!token) return res.status(401).json({ error: "Security Token Missing from request header!" });
+
+        // Token Decode Logic
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch(e) {
+            return res.status(403).json({ error: "Unauthorized! Token has expired." });
+        }
+
         if (!req.file) return res.status(400).json({ error: "Please attach valid test sheet." });
 
         const workbook = xlsx.readFile(req.file.path);
-        const sheetName = workbook.SheetNames[0];
-        const rows = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+        const rows = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames]);
 
-        if (rows.length === 0) return res.status(400).json({ error: "Sheet is empty." });
+        if (rows.length === 0) return res.status(400).json({ error: "Excel data rows are empty." });
 
-        // Pehli row se configurations nikalna
         const detectedBatch = rows[0].targetBatch;
         const detectedTitle = rows[0].testTitle;
         const detectedDate = rows[0].examDate;
         const detectedDuration = rows[0].testDuration || 180;
 
-        if (!detectedBatch || !detectedTitle) {
-            return res.status(400).json({ error: "Excel error: targetBatch or testTitle columns are missing in row 1." });
+        // Security Check: Kya is token ke paas is batch me upload karne ki permission hai?
+        const allowedBatches = decoded.allowedBatches || ['Yakeen NEET', 'Prayas JEE', 'Arjuna JEE', 'Lakshya NEET'];
+        if (!allowedBatches.includes(detectedBatch)) {
+            return res.status(403).json({ error: `Access Denied! Your token doesn't have permissions for '${detectedBatch}'.` });
         }
 
-        // Saare rows ko loop me structural process karna
         const processedQuestions = rows.map(row => ({
             subject: row.subject,
             questionType: row.questionType,
@@ -87,7 +88,6 @@ app.post('/api/zx-admin/auto-update-tests', verifyAdminJWT, upload.single('excel
             correctAnswer: String(row.correctAnswer).trim()
         }));
 
-        // Database me check karke direct insert ya override karna (Upsert logic)
         await ZxTest.findOneAndUpdate(
             { targetBatch: detectedBatch, testTitle: detectedTitle },
             {
@@ -101,16 +101,15 @@ app.post('/api/zx-admin/auto-update-tests', verifyAdminJWT, upload.single('excel
             { upsert: true, new: true }
         );
 
-        res.json({ success: true, message: `Zx Portal Auto-Updated! '${detectedTitle}' is now completely live inside '${detectedBatch}'.` });
+        res.json({ success: true, message: `Successfully updated! '${detectedTitle}' is now live in '${detectedBatch}'.` });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Internal Server Error during Excel data injection." });
+        res.status(500).json({ error: "Excel structural mapping failure." });
     }
 });
 
-// Default dashboard render
-app.get('/', (req, res) => {
+// Serve Frontend Screen directly
+app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.listen(PORT, () => console.log(`Admin Console engine active on port ${PORT}`));
+app.listen(PORT, () => console.log(`Admin Core active on channel ${PORT}`));

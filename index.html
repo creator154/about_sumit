@@ -3,91 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zx Site - Master Admin Panel</title>
+    <title>Zx Site - Batch Uploader Engine</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background: #f1f2f6; padding: 50px 20px; color: #2f3542; }
-        .dashboard-box { max-width: 450px; margin: auto; background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        h2 { text-align: center; margin-bottom: 25px; color: #1e90ff; }
-        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #ced6e0; outline: none; font-size: 15px; }
-        button { background: #1e90ff; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { background: #3742fa; }
-        #statusReport { text-align: center; font-weight: bold; margin-top: 15px; font-size: 14px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: #f6f8fa; padding: 40px 20px; color: #333; }
+        .uploader-card { max-width: 500px; margin: auto; background: white; padding: 35px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.06); border: 1px solid #e1e4e8; }
+        h2 { color: #0366d6; text-align: center; margin-bottom: 10px; font-weight: 600; }
+        .tagline { text-align: center; color: #586069; font-size: 13px; margin-bottom: 25px; }
+        input, button, textarea { width: 100%; padding: 12px; margin: 12px 0; border-radius: 8px; border: 1px solid #d1d5da; font-size: 14px; outline: none; }
+        textarea { resize: none; height: 80px; font-family: monospace; }
+        button { background: #0366d6; color: white; border: none; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #0255b3; }
+        .batch-badge { inline-block; background: #e1f5fe; color: #0288d1; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin: 4px; display: inline-block; }
+        #statusLogger { text-align: center; font-weight: bold; margin-top: 15px; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <div class="dashboard-box">
-        <h2>Zx Master Dashboard</h2>
-        
-        <!-- Secure Gate 1: Password Authenticator -->
-        <div id="authPanel">
-            <p style="font-size: 13px; color: gray; margin-bottom: 10px; text-align: center;">Enter system tokens to establish control link.</p>
-            <input type="text" id="adminUser" placeholder="Admin Username">
-            <input type="password" id="adminPass" placeholder="System Security Password">
-            <button onclick="authenticateAdmin()">Verify Identity (JWT)</button>
+    <div class="uploader-card">
+        <h2>Zx Master Batch Uploader</h2>
+        <div class="tagline">Direct dynamic token verification and excel update console</div>
+
+        <!-- Step 1: Verification Box (Always visible at start) -->
+        <div id="tokenVerifyGate">
+            <label style="font-weight: 600; font-size: 13px;">Paste Security JWT Token String:</label>
+            <textarea id="tokenInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."></textarea>
+            <button onclick="verifyAccessTokens()">Verify Token Permissions</button>
         </div>
 
-        <!-- Secure Gate 2: Hidden Excel Upload Control -->
-        <div id="uploadPanel" style="display: none;">
-            <p style="color: #2ed573; font-weight: bold; text-align: center; margin-bottom: 15px;">✓ Secure Session Connected</p>
-            <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 5px;">Select Test Pattern Excel Sheet (.xlsx):</label>
-            <input type="file" id="bulkSheet" accept=".xlsx, .xls">
-            <button onclick="triggerAutoInject()" style="background: #2ed573;">Upload & Update Main Site</button>
+        <!-- Step 2: Upload Actions (Activates only if token is valid) -->
+        <div id="uploadGate" style="display: none; border-top: 2px dashed #e1e4e8; padding-top: 20px; margin-top: 10px;">
+            <p style="color: #28a745; font-weight: bold; margin-bottom: 10px;">✓ Token Authenticated Successfully</p>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: 600; font-size: 13px; display: block; margin-bottom: 5px;">Your Access Batches:</label>
+                <div id="batchBadgesContainer"></div>
+            </div>
+
+            <label style="font-weight: 600; font-size: 13px; display: block; margin-bottom: 5px;">Choose Test Document Matrix (.xlsx):</label>
+            <input type="file" id="excelSheet" accept=".xlsx">
+            <button onclick="uploadAndPublishTest()" style="background: #28a745;">Upload & Publish Test Series</button>
         </div>
-        
-        <div id="statusReport"></div>
+
+        <div id="statusLogger"></div>
     </div>
 
     <script>
-        let secureJWTToken = "";
-        const reportBox = document.getElementById('statusReport');
+        let verifiedJWTStr = "";
+        const logger = document.getElementById('statusLogger');
 
-        async function authenticateAdmin() {
-            const username = document.getElementById('adminUser').value;
-            const password = document.getElementById('adminPass').value;
-            
-            const res = await fetch('/api/zx-admin/login', {
+        async function verifyAccessTokens() {
+            const tokenValue = document.getElementById('tokenInput').value.trim();
+            if(!tokenValue) return alert("Please enter the JWT token string first!");
+
+            logger.innerText = "";
+
+            const res = await fetch('/api/zx-admin/verify-token', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ token: tokenValue })
             });
             const data = await res.json();
-            
+
             if(data.success) {
-                secureJWTToken = data.token;
-                document.getElementById('authPanel').style.display = 'none';
-                document.getElementById('uploadPanel').style.display = 'block';
-                reportBox.innerText = "";
+                verifiedJWTStr = tokenValue;
+                document.getElementById('tokenVerifyGate').style.display = 'none';
+                document.getElementById('uploadGate').style.display = 'block';
+                
+                // Active badges show karna jo token me encrypted hain
+                const container = document.getElementById('batchBadgesContainer');
+                container.innerHTML = data.allowedBatches.map(b => `<span class="batch-badge">📚 ${b}</span>`).join('');
+                logger.innerText = "";
             } else {
-                reportBox.style.color = "#ff4757";
-                reportBox.innerText = data.error;
+                logger.style.color = "#cb2431";
+                logger.innerText = data.error || "Verification tracking error!";
             }
         }
 
-        async function triggerAutoInject() {
-            const fileChooser = document.getElementById('bulkSheet');
-            if(fileChooser.files.length === 0) return alert("Please choose an Excel doc matrix first!");
+        async function uploadAndPublishTest() {
+            const fileBox = document.getElementById('excelSheet');
+            if(fileBox.files.length === 0) return alert("Select an Excel sheet file matrix first!");
 
-            const formData = new FormData();
-            formData.append("excelDoc", fileChooser.files[0]);
+            const payload = new FormData();
+            payload.append("excelDoc", fileBox.files[0]);
 
-            reportBox.style.color = "#ffa500";
-            reportBox.innerText = "Processing rows and streaming payload to database...";
+            logger.style.color = "#a76000";
+            logger.innerText = "Parsing spreadsheet rows and updating live server components...";
 
             const res = await fetch('/api/zx-admin/auto-update-tests', {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${secureJWTToken}` },
-                body: formData
+                headers: { 'Authorization': `Bearer ${verifiedJWTStr}` },
+                body: payload
             });
             const data = await res.json();
 
             if(data.success) {
-                reportBox.style.color = "#2ed573";
-                reportBox.innerText = data.message;
+                logger.style.color = "#28a745";
+                logger.innerText = data.message;
             } else {
-                reportBox.style.color = "#ff4757";
-                reportBox.innerText = data.error;
+                logger.style.color = "#cb2431";
+                logger.innerText = data.error;
             }
         }
     </script>
